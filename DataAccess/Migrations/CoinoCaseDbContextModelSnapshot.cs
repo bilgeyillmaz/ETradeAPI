@@ -22,20 +22,242 @@ namespace DataAccess.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
-            modelBuilder.Entity("Entities.Concrete.RegisterModel", b =>
+            modelBuilder.Entity("Entities.Concrete.CartsProduct", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int?>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int?>("Id"), 1L, 1);
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ShoppingCartId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CartsProducts");
+                });
+
+            modelBuilder.Entity("Entities.Concrete.Category", b =>
+                {
+                    b.Property<int?>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int?>("Id"), 1L, 1);
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Categories");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Kırtasiye"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Elektronik"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "Mobilya"
+                        });
+                });
+
+            modelBuilder.Entity("Entities.Concrete.Order", b =>
+                {
+                    b.Property<int?>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int?>("Id"), 1L, 1);
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("IdentityUserId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OrderNo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("ShoppingCartId")
+                        .HasColumnType("int");
+
+                    b.Property<double?>("TotalPrice")
+                        .HasColumnType("float");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Orders");
+                });
+
+            modelBuilder.Entity("Entities.Concrete.Product", b =>
+                {
+                    b.Property<int?>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int?>("Id"), 1L, 1);
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsStock")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double?>("Price")
+                        .HasColumnType("float");
+
+                    b.Property<int?>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ShoppingCartId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ShoppingCartId");
+
+                    b.ToTable("Products");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CategoryId = 1,
+                            IsStock = true,
+                            Name = "Kalem",
+                            Price = 100.0,
+                            Quantity = 20,
+                            UpdatedDate = new DateTime(2023, 1, 26, 10, 13, 41, 307, DateTimeKind.Local).AddTicks(5473)
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CategoryId = 1,
+                            IsStock = true,
+                            Name = "Silgi",
+                            Price = 200.0,
+                            Quantity = 30,
+                            UpdatedDate = new DateTime(2023, 1, 26, 10, 13, 41, 307, DateTimeKind.Local).AddTicks(5487)
+                        },
+                        new
+                        {
+                            Id = 3,
+                            CategoryId = 1,
+                            IsStock = true,
+                            Name = "Defter",
+                            Price = 600.0,
+                            Quantity = 60,
+                            UpdatedDate = new DateTime(2023, 1, 26, 10, 13, 41, 307, DateTimeKind.Local).AddTicks(5489)
+                        },
+                        new
+                        {
+                            Id = 4,
+                            CategoryId = 1,
+                            IsStock = true,
+                            Name = "Kalemtraş",
+                            Price = 600.0,
+                            Quantity = 60,
+                            UpdatedDate = new DateTime(2023, 1, 26, 10, 13, 41, 307, DateTimeKind.Local).AddTicks(5490)
+                        },
+                        new
+                        {
+                            Id = 5,
+                            CategoryId = 2,
+                            IsStock = true,
+                            Name = "Televizyon",
+                            Price = 6600.0,
+                            Quantity = 320,
+                            UpdatedDate = new DateTime(2023, 1, 26, 10, 13, 41, 307, DateTimeKind.Local).AddTicks(5491)
+                        },
+                        new
+                        {
+                            Id = 7,
+                            CategoryId = 2,
+                            IsStock = true,
+                            Name = "Laptop",
+                            Price = 6600.0,
+                            Quantity = 320,
+                            UpdatedDate = new DateTime(2023, 1, 26, 10, 13, 41, 307, DateTimeKind.Local).AddTicks(5499)
+                        },
+                        new
+                        {
+                            Id = 8,
+                            CategoryId = 2,
+                            IsStock = true,
+                            Name = "Klavye",
+                            Price = 6600.0,
+                            Quantity = 320,
+                            UpdatedDate = new DateTime(2023, 1, 26, 10, 13, 41, 307, DateTimeKind.Local).AddTicks(5500)
+                        },
+                        new
+                        {
+                            Id = 9,
+                            CategoryId = 2,
+                            IsStock = true,
+                            Name = "Monitör",
+                            Price = 6600.0,
+                            Quantity = 320,
+                            UpdatedDate = new DateTime(2023, 1, 26, 10, 13, 41, 307, DateTimeKind.Local).AddTicks(5501)
+                        });
+                });
+
+            modelBuilder.Entity("Entities.Concrete.RegisterModel", b =>
+                {
+                    b.Property<int?>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int?>("Id"), 1L, 1);
 
                     b.Property<string>("Address")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("EmailAddress")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("IdentityUserId")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Password")
@@ -46,6 +268,12 @@ namespace DataAccess.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("Role")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Username")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -53,6 +281,56 @@ namespace DataAccess.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("RegisterModels");
+                });
+
+            modelBuilder.Entity("Entities.Concrete.ShoppingCart", b =>
+                {
+                    b.Property<int?>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int?>("Id"), 1L, 1);
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("IdentityUserId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double?>("Price")
+                        .HasColumnType("float");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ShoppingCarts");
+                });
+
+            modelBuilder.Entity("Entities.Concrete.Wallet", b =>
+                {
+                    b.Property<int?>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int?>("Id"), 1L, 1);
+
+                    b.Property<double?>("Balance")
+                        .HasColumnType("float");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("IdentityUserId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Wallets");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -253,6 +531,13 @@ namespace DataAccess.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("Entities.Concrete.Product", b =>
+                {
+                    b.HasOne("Entities.Concrete.ShoppingCart", null)
+                        .WithMany("Products")
+                        .HasForeignKey("ShoppingCartId");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -302,6 +587,11 @@ namespace DataAccess.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Entities.Concrete.ShoppingCart", b =>
+                {
+                    b.Navigation("Products");
                 });
 #pragma warning restore 612, 618
         }

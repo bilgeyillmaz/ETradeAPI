@@ -4,9 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Core.Entities
+namespace Core.UnitOfWork
 {
-    public interface IDto
+    public interface IUnitOfWork
     {
+        Task CommitAsync();
+        void Commit();
     }
 }

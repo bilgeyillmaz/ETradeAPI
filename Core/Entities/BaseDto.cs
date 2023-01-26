@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace Core.Entities
 {
-    public interface IEntity
+    public abstract class BaseDto
     {
+        public int? Id { get; set; }
+        public DateTime? CreatedDate { get; set; }
     }
 }

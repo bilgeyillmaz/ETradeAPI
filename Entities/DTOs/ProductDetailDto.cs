@@ -1,0 +1,17 @@
+﻿using Core.Entities;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Entities.DTOs
+{
+    public class ProductDetailDto:BaseDto
+    {
+        public string? ProductName { get; set; }
+        public string? CategoryName { get; set; }
+        public double? ProductPrice { get; set; }
+        public int? ProductQuantity { get; set; }
+    }
+}

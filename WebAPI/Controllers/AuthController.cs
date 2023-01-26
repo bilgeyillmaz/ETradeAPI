@@ -1,8 +1,11 @@
-﻿using Entities.Concrete;
+﻿using Business.Abstract;
+using Business.Concrete;
+using Entities.Concrete;
 using Entities.DTOs;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -16,16 +19,19 @@ namespace WebAPI.Controllers
     {
         private readonly UserManager<IdentityUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly IRegisterModelService _registerModelService;
         private readonly IConfiguration _configuration;
 
         public AuthController(
             UserManager<IdentityUser> userManager,
             RoleManager<IdentityRole> roleManager,
+           IRegisterModelService registerModelService,
             IConfiguration configuration)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _configuration = configuration;
+            _registerModelService = registerModelService;
         }
 
         [HttpPost]
@@ -60,12 +66,15 @@ namespace WebAPI.Controllers
         }
 
         [HttpPost]
-        [Route("register")]
+        [Route("register-as-a-member")]
         public async Task<IActionResult> Register([FromBody] RegisterDto model)
         {
+            if (await _userManager.FindByEmailAsync(model.EmailAddress) != null)
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new Response { Status = "Error", Message = $"{model.EmailAddress} already exists!" });
             var userExists = await _userManager.FindByNameAsync(model.Username);
             if (userExists != null)
-                return StatusCode(StatusCodes.Status500InternalServerError, 
+                return StatusCode(StatusCodes.Status500InternalServerError,
                     new Response { Status = "Error", Message = "User already exists!" });
 
             IdentityUser user = new()
@@ -73,11 +82,22 @@ namespace WebAPI.Controllers
                 Email = model.EmailAddress,
                 SecurityStamp = Guid.NewGuid().ToString(),
                 UserName = model.Username,
-                PhoneNumber= model.PhoneNumber
+                PhoneNumber = model.PhoneNumber
             };
             var result = await _userManager.CreateAsync(user, model.Password);
+            RegisterModel registerModel = new RegisterModel()
+            {
+                IdentityUserId = user.Id,
+                Role = Core.Entities.Enums.UserRoles.Member,
+                Address = model.Address,
+                Password = model.Password,
+                Username = model.Username,
+                PhoneNumber = model.PhoneNumber,
+                EmailAddress = model.EmailAddress
+            };
+            await _registerModelService.AddWithShoppingCartAndWalletAsync(registerModel);
             if (!result.Succeeded)
-                return StatusCode(StatusCodes.Status500InternalServerError, 
+                return StatusCode(StatusCodes.Status500InternalServerError,
                     new Response { Status = "Error", Message = "User creation failed! Please check user details and try again." });
 
             return Ok(new Response { Status = "Success", Message = "User created successfully!" });
@@ -87,9 +107,12 @@ namespace WebAPI.Controllers
         [Route("register-admin")]
         public async Task<IActionResult> RegisterAdmin([FromBody] RegisterDto model)
         {
+            if (await _userManager.FindByEmailAsync(model.EmailAddress) != null)
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new Response { Status = "Error", Message = $"{model.EmailAddress} already exists!" });
             var userExists = await _userManager.FindByNameAsync(model.Username);
-            if (userExists != null)
-                return StatusCode(StatusCodes.Status500InternalServerError, 
+            if (await _userManager.FindByEmailAsync(model.EmailAddress) != null)
+                return StatusCode(StatusCodes.Status500InternalServerError,
                     new Response { Status = "Error", Message = "User already exists!" });
 
             IdentityUser user = new()
@@ -97,12 +120,30 @@ namespace WebAPI.Controllers
                 Email = model.EmailAddress,
                 SecurityStamp = Guid.NewGuid().ToString(),
                 UserName = model.Username,
-                PhoneNumber= model.PhoneNumber  
+                PhoneNumber = model.PhoneNumber
             };
             var result = await _userManager.CreateAsync(user, model.Password);
+
+            RegisterModel registerModel = new RegisterModel()
+            {
+                IdentityUserId = user.Email,
+                Role = Core.Entities.Enums.UserRoles.Admin,
+                Address = model.Address,
+                Password = model.Password,
+                Username = model.Username,
+                PhoneNumber = model.PhoneNumber,
+                EmailAddress = model.EmailAddress
+            };
+
             if (!result.Succeeded)
-                return StatusCode(StatusCodes.Status500InternalServerError, 
-                    new Response { Status = "Error", Message = "User creation failed! Please check user details and try again." });
+                await _registerModelService.AddWithShoppingCartAndWalletAsync(registerModel);
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new Response
+                    {
+                        Status = "Error",
+                        Message = "User creation failed! Please check user details and try again. " +
+                    "Check the username it must not include space"
+                    });
 
             if (!await _roleManager.RoleExistsAsync(UserRoles.Admin))
                 await _roleManager.CreateAsync(new IdentityRole(UserRoles.Admin));
@@ -134,5 +175,13 @@ namespace WebAPI.Controllers
 
             return token;
         }
+
+        //public async Task<IdentityResult> ResetPasswordAsync(string password)
+        //{
+        //    var currentUserID = User.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value;
+        //    var user = _userManager.FindByIdAsync(currentUserID).Result;
+        //    string token = await _userManager.GeneratePasswordResetTokenAsync(user);
+        //    return await _userManager.ResetPasswordAsync(user, token, password);
+        //}
     }
 }
